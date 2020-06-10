@@ -65,7 +65,7 @@ public class OpenHashMapImpl implements OpenHashMap {
      * @param key
      * @return
      */
-    public Long get(int key) {
+    public long get(int key) {
         int hash = hashFunction(key);
         for (int i = hash; ; i++) {
             if (keys[i] == FREE_SPACE) {

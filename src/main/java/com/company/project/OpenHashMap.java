@@ -16,7 +16,7 @@ public interface OpenHashMap {
      * @param key
      * @return
      */
-    Long get(int key);
+    long get(int key);
 
     /**
      * @return
