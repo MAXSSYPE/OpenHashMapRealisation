@@ -86,6 +86,14 @@ public class OpenHashMapTest {
     }
 
     @Test
+    void callPutWithKeyEqualsFreeSpace() {
+        OpenHashMapImpl openHashMap = new OpenHashMapImpl();
+        int testKey = Integer.MIN_VALUE;
+        long testValue = 2;
+        assertThrows(IllegalArgumentException.class, () -> new OpenHashMapImpl().put(testKey, testValue));
+    }
+
+    @Test
     void testEquals() {
         OpenHashMapImpl firstTestOpenHashMap = new OpenHashMapImpl();
         OpenHashMapImpl secondTestOpenHashMap = new OpenHashMapImpl(1000);

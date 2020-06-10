@@ -39,6 +39,9 @@ public class OpenHashMapImpl implements OpenHashMap {
      * @return
      */
     public boolean put(int key, long value) {
+        if (key == FREE_SPACE) {
+            throw new IllegalArgumentException("Illegal key: " + key);
+        }
         int hash = hashFunction(key);
         int i = 0;
         if (keys[hash] == FREE_SPACE || keys[hash] == key) {
@@ -65,7 +68,6 @@ public class OpenHashMapImpl implements OpenHashMap {
     public Long get(int key) {
         int hash = hashFunction(key);
         for (int i = hash; ; i++) {
-            //if (i == initSize) i = 0;
             if (keys[i] == FREE_SPACE) {
                 throw new NoSuchElementException("No such key in map");
             }
