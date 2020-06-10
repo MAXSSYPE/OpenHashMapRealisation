@@ -5,6 +5,8 @@ import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
+import java.util.NoSuchElementException;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
@@ -58,7 +60,10 @@ public class OpenHashMapTest {
     @Test
     void callSizeShouldReturnSize() {
         int testSize = 200;
-        OpenHashMapImpl openHashMap = new OpenHashMapImpl(testSize);
+        OpenHashMapImpl openHashMap = new OpenHashMapImpl();
+        for (int i = 0; i < testSize; i++) {
+            openHashMap.put(i, -i + 3);
+        }
         assertEquals(testSize, openHashMap.size());
     }
 
@@ -66,7 +71,7 @@ public class OpenHashMapTest {
     void callGetWithNoSuchElement() {
         OpenHashMapImpl openHashMap = new OpenHashMapImpl();
         int testKey = -1;
-        assertNull(openHashMap.get(testKey));
+        assertThrows(NoSuchElementException.class, () -> new OpenHashMapImpl().get(testKey));
     }
 
     @Test
@@ -94,7 +99,7 @@ public class OpenHashMapTest {
     @Test
     void testToString() {
         OpenHashMapImpl openHashMap = new OpenHashMapImpl(10);
-        String expected = "OpenHashMapImpl{map=[null, null, null, null, null, null, null, null, null, null]}";
+        String expected = "OpenHashMapImpl{keys=[-2147483648, -2147483648, -2147483648, -2147483648, -2147483648, -2147483648, -2147483648, -2147483648, -2147483648, -2147483648], values=[0, 0, 0, 0, 0, 0, 0, 0, 0, 0], size=0}";
         assertEquals(expected, openHashMap.toString());
     }
 }

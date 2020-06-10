@@ -1,6 +1,6 @@
 package com.company.project;
 
-import java.util.Arrays;
+import java.util.*;
 
 /**
  * @author Max
@@ -8,10 +8,16 @@ import java.util.Arrays;
 
 public class OpenHashMapImpl implements OpenHashMap {
 
-    private Pair[] map;
+    private final int FREE_SPACE = Integer.MIN_VALUE;
+    private int[] keys;
+    private long[] values;
+    private int size;
 
     public OpenHashMapImpl() {
-        map = new Pair[1000];
+        keys = new int[1000];
+        values = new long[1000];
+        size = 0;
+        Arrays.fill(keys, FREE_SPACE);
     }
 
     /**
@@ -21,7 +27,10 @@ public class OpenHashMapImpl implements OpenHashMap {
         if (size <= 0) {
             throw new IllegalArgumentException("Illegal size: " + size);
         }
-        map = new Pair[size];
+        keys = new int[size];
+        values = new long[size];
+        this.size = 0;
+        Arrays.fill(keys, FREE_SPACE);
     }
 
     /**
@@ -32,13 +41,17 @@ public class OpenHashMapImpl implements OpenHashMap {
     public boolean put(int key, long value) {
         int hash = hashFunction(key);
         int i = 0;
-        if (map[hash] == null || map[hash].getKey() == key) {
-            map[hash] = new Pair(key, value);
+        if (keys[hash] == FREE_SPACE || keys[hash] == key) {
+            keys[hash] = key;
+            values[hash] = value;
+            size++;
             return true;
         }
-        for (i = hash + 1; i != hash; i = (i + 1) % map.length) {
-            if (map[i] == null || map[i].getKey() == key) {
-                map[i] = new Pair(key, value);
+        for (i = hash + 1; i != hash; i = (i + 1) % keys.length) {
+            if (keys[hash] == FREE_SPACE || keys[hash] == key) {
+                keys[i] = key;
+                values[i] = value;
+                size++;
                 return true;
             }
         }
@@ -51,26 +64,22 @@ public class OpenHashMapImpl implements OpenHashMap {
      */
     public Long get(int key) {
         int hash = hashFunction(key);
-        if (map[hash] == null) {
-            return null;
-        }
-        if (map[hash].getKey() == key) {
-            return map[hash].getValue();
-        }
-
-        for (int i = hash + 1; i != hash; i = (i + 1) % map.length) {
-            if (map[i] != null && map[i].getValue() == key) {
-                return map[hash].getValue();
+        for (int i = hash; ; i++) {
+            //if (i == initSize) i = 0;
+            if (keys[i] == FREE_SPACE) {
+                throw new NoSuchElementException("No such key in map");
+            }
+            if (keys[i] == key) {
+                return values[i];
             }
         }
-        return null;
     }
 
     /**
      * @return
      */
     public int size() {
-        return map.length;
+        return size;
     }
 
     /**
@@ -78,7 +87,7 @@ public class OpenHashMapImpl implements OpenHashMap {
      * @return
      */
     private int hashFunction(int number) {
-        return Math.abs(number % map.length);
+        return Math.abs(number % keys.length);
     }
 
     /**
@@ -90,7 +99,7 @@ public class OpenHashMapImpl implements OpenHashMap {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         OpenHashMapImpl that = (OpenHashMapImpl) o;
-        return Arrays.equals(map, that.map);
+        return size == that.size && Arrays.equals(keys, that.keys) && Arrays.equals(values, that.values);
     }
 
     /**
@@ -98,7 +107,10 @@ public class OpenHashMapImpl implements OpenHashMap {
      */
     @Override
     public int hashCode() {
-        return Arrays.hashCode(map);
+        int result = Objects.hash(FREE_SPACE, size);
+        result = 31 * result + Arrays.hashCode(keys);
+        result = 31 * result + Arrays.hashCode(values);
+        return result;
     }
 
     /**
@@ -107,7 +119,9 @@ public class OpenHashMapImpl implements OpenHashMap {
     @Override
     public String toString() {
         return "OpenHashMapImpl{" +
-                "map=" + Arrays.toString(map) +
+                "keys=" + Arrays.toString(keys) +
+                ", values=" + Arrays.toString(values) +
+                ", size=" + size +
                 '}';
     }
 }
